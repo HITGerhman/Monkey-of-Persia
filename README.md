@@ -1,6 +1,6 @@
 # ⏳ Time Rewind Demo (Unity)
 
-一个基于 Unity 2D 的时间回溯机制 Demo，灵感来源于《Braid》。
+一个基于 Unity 2D 的时间回溯机制 Demo，灵感来源于《Braid》和《波斯王子》。
 实现了基于环形缓冲区的状态记录与回放系统。
 
 ## 🎮 演示 (Demo)
