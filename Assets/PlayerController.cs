@@ -1,20 +1,20 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
-    // ... (Ö®Ç°µÄ±äÁ¿±£³Ö²»±ä) ...
-    [Header("ºËĞÄ²ÎÊı")]
+    // ... (ä¹‹å‰çš„å˜é‡ä¿æŒä¸å˜) ...
+    [Header("æ ¸å¿ƒå‚æ•°")]
     public float moveSpeed = 10f;
     public float jumpForce = 16f;
     public float fallMultiplier = 2.5f;
     public float lowJumpMultiplier = 2f;
 
-    [Header("ÊÖ¸ĞÓÅ»¯")]
+    [Header("æ‰‹æ„Ÿä¼˜åŒ–")]
     public float coyoteTime = 0.1f;
     public float jumpBufferTime = 0.1f;
 
-    [Header("¼ì²âÉèÖÃ")]
+    [Header("æ£€æµ‹è®¾ç½®")]
     public Transform groundCheckPoint;
     public float checkRadius = 0.2f;
     public LayerMask whatIsGround;
@@ -25,32 +25,32 @@ public class PlayerController : MonoBehaviour
     private float _coyoteTimeCounter;
     private float _jumpBufferCounter;
 
-    // ¡¾ĞÂÔö¡¿ËÀÍö×´Ì¬±ê¼Ç
-    public bool IsDead { get; private set; } // ¹«ÓĞÊôĞÔ£¬¹©ÆäËû½Å±¾¶ÁÈ¡
-    private SpriteRenderer _sr; // ÓÃÀ´±äÉ«
+    // ã€æ–°å¢ã€‘æ­»äº¡çŠ¶æ€æ ‡è®°
+    public bool IsDead { get; private set; } // å…¬æœ‰å±æ€§ï¼Œä¾›å…¶ä»–è„šæœ¬è¯»å–
+    private SpriteRenderer _sr; // ç”¨æ¥å˜è‰²
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
-        // ¡¾ĞÂÔö¡¿»ñÈ¡äÖÈ¾×é¼şÒÔ±ã±äÉ«
+        // ã€æ–°å¢ã€‘è·å–æ¸²æŸ“ç»„ä»¶ä»¥ä¾¿å˜è‰²
         _sr = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
     {
-        // ¡¾ĞÂÔö¡¿Èç¹ûËÀÁË£¬Ö±½ÓÇĞ¶ÏÊäÈë£¬ºóĞø´úÂë¶¼²»Ö´ĞĞ
+        // ã€æ–°å¢ã€‘å¦‚æœæ­»äº†ï¼Œç›´æ¥åˆ‡æ–­è¾“å…¥ï¼Œåç»­ä»£ç éƒ½ä¸æ‰§è¡Œ
         if (IsDead)
         {
-            // ÕâÀï¿ÉÒÔ¼ÓÒ»¸ö¼ì²â£ºÈç¹ûÍæ¼Ò°´ÁËµ¹Á÷¼ü£¬¾ÍÔÊĞí½Å±¾¼ÌĞøÔËĞĞ£¨½»¸ø TimeBody ´¦Àí£©
-            // µ«ÎªÁË¼òµ¥£¬ÎÒÃÇÔÚÏÂÃæµ¥¶À´¦Àí¸´»î
+            // è¿™é‡Œå¯ä»¥åŠ ä¸€ä¸ªæ£€æµ‹ï¼šå¦‚æœç©å®¶æŒ‰äº†å€’æµé”®ï¼Œå°±å…è®¸è„šæœ¬ç»§ç»­è¿è¡Œï¼ˆäº¤ç»™ TimeBody å¤„ç†ï¼‰
+            // ä½†ä¸ºäº†ç®€å•ï¼Œæˆ‘ä»¬åœ¨ä¸‹é¢å•ç‹¬å¤„ç†å¤æ´»
             return;
         }
 
-        // ... (Ô­ÓĞµÄ ProcessInput, UpdateTimers, CheckJump Âß¼­) ...
-        // (ÎªÁË½ÚÊ¡Æª·ù£¬ÕâÀïÊ¡ÂÔÔ­ÓĞ´úÂë£¬Çë±£³ÖÄãÔ­À´ Update ÀïµÄÄÚÈİ)
-        // ½¨Òé°ÑÖ®Ç°µÄÂß¼­·â×°³É ProcessInput() µÈº¯Êı£¬»òÕßÖ±½Ó±£ÁôÔ­Ñù
+        // ... (åŸæœ‰çš„ ProcessInput, UpdateTimers, CheckJump é€»è¾‘) ...
+        // (ä¸ºäº†èŠ‚çœç¯‡å¹…ï¼Œè¿™é‡Œçœç•¥åŸæœ‰ä»£ç ï¼Œè¯·ä¿æŒä½ åŸæ¥ Update é‡Œçš„å†…å®¹)
+        // å»ºè®®æŠŠä¹‹å‰çš„é€»è¾‘å°è£…æˆ ProcessInput() ç­‰å‡½æ•°ï¼Œæˆ–è€…ç›´æ¥ä¿ç•™åŸæ ·
 
-        // --- ÒÔÏÂÊÇÔ­ Update ´úÂëµÄ¾«¼ò°æÒıÓÃ ---
+        // --- ä»¥ä¸‹æ˜¯åŸ Update ä»£ç çš„ç²¾ç®€ç‰ˆå¼•ç”¨ ---
         _moveInput = Input.GetAxisRaw("Horizontal");
         _isGrounded = Physics2D.OverlapCircle(groundCheckPoint.position, checkRadius, whatIsGround);
 
@@ -74,46 +74,46 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // ¡¾ĞÂÔö¡¿ËÀÁË¾Í²»ÒªÔÙ¸ø¸ÕÌåÊ©¼ÓÁ¦ÁË
+        // ã€æ–°å¢ã€‘æ­»äº†å°±ä¸è¦å†ç»™åˆšä½“æ–½åŠ åŠ›äº†
         if (IsDead) return;
 
         _rb.velocity = new Vector2(_moveInput * moveSpeed, _rb.velocity.y);
     }
 
-    // ¡¾ĞÂÔö¡¿Åö×²¼ì²âÂß¼­
+    // ã€æ–°å¢ã€‘ç¢°æ’æ£€æµ‹é€»è¾‘
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Ö»ÓĞ»î×ÅµÄÊ±ºò²ÅÄÜËÀ
+        // åªæœ‰æ´»ç€çš„æ—¶å€™æ‰èƒ½æ­»
         if (!IsDead && collision.CompareTag("Danger"))
         {
             Die();
         }
     }
 
-    // ¡¾ĞÂÔö¡¿ËÀÍö´¦Àí
+    // ã€æ–°å¢ã€‘æ­»äº¡å¤„ç†
     void Die()
     {
         IsDead = true;
 
-        // ÊÓ¾õ·´À¡£º±äºì
+        // è§†è§‰åé¦ˆï¼šå˜çº¢
         _sr.color = Color.red;
 
-        // ÎïÀí·´À¡£ºÍ£ÏÂ²¢¶³½á
+        // ç‰©ç†åé¦ˆï¼šåœä¸‹å¹¶å†»ç»“
         _rb.velocity = Vector2.zero;
-        _rb.isKinematic = true; // ¹ÒÔÚ´ÌÉÏ£¬²»ÒªµôÏÂÈ¥
+        _rb.isKinematic = true; // æŒ‚åœ¨åˆºä¸Šï¼Œä¸è¦æ‰ä¸‹å»
 
-        Debug.Log("ÄãËÀÁË£¡°´»Ø³µµ¹Á÷£¡");
+        Debug.Log("ä½ æ­»äº†ï¼æŒ‰å›è½¦å€’æµï¼");
     }
 
-    // ¡¾ĞÂÔö¡¿¸´»î·½·¨£¨½«±» TimeBody µ÷ÓÃ£©
+    // ã€æ–°å¢ã€‘å¤æ´»æ–¹æ³•ï¼ˆå°†è¢« TimeBody è°ƒç”¨ï¼‰
     public void Resurrect()
     {
         IsDead = false;
-        _sr.color = Color.green; // »Ö¸´Ô­À´µÄÑÕÉ«£¨»òÕß°×É«£©
-        _rb.isKinematic = false; // »Ö¸´ÎïÀí
+        _sr.color = Color.green; // æ¢å¤åŸæ¥çš„é¢œè‰²ï¼ˆæˆ–è€…ç™½è‰²ï¼‰
+        _rb.isKinematic = false; // æ¢å¤ç‰©ç†
     }
 
-    // ... (OnDrawGizmos ±£³Ö²»±ä) ...
+    // ... (OnDrawGizmos ä¿æŒä¸å˜) ...
     private void OnDrawGizmosSelected()
     {
         if (groundCheckPoint == null) return;

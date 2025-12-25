@@ -1,35 +1,35 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    [Header("Ä¿±êÉèÖÃ")]
-    public Transform target;        // Òª¸úËæµÄÖ÷½Ç
-    public Vector3 offset = new Vector3(0f, 0f, -10f); // Ïà¶ÔÆ«ÒÆÁ¿ (ZÖá±ØĞëÊÇ-10£¬·ñÔòÏà»ú»á¿´²»µ½2DÎïÌå)
+    [Header("ç›®æ ‡è®¾ç½®")]
+    public Transform target;        // è¦è·Ÿéšçš„ä¸»è§’
+    public Vector3 offset = new Vector3(0f, 0f, -10f); // ç›¸å¯¹åç§»é‡ (Zè½´å¿…é¡»æ˜¯-10ï¼Œå¦åˆ™ç›¸æœºä¼šçœ‹ä¸åˆ°2Dç‰©ä½“)
 
-    [Header("ÊÖ¸ĞÎ¢µ÷")]
+    [Header("æ‰‹æ„Ÿå¾®è°ƒ")]
     [Range(0, 1)]
-    public float smoothSpeed = 0.125f; // ¸úËæÑÓ³Ù (0=Ë²¼ä, 1=²»¶¯)£¬Ô½Ğ¡Ô½½ô£¬Ô½´óÔ½Æ½»¬
+    public float smoothSpeed = 0.125f; // è·Ÿéšå»¶è¿Ÿ (0=ç¬é—´, 1=ä¸åŠ¨)ï¼Œè¶Šå°è¶Šç´§ï¼Œè¶Šå¤§è¶Šå¹³æ»‘
 
-    // ÄÚ²¿±äÁ¿£º¼ÇÂ¼µ±Ç°ËÙ¶È£¬¹© SmoothDamp º¯ÊıÊ¹ÓÃ
+    // å†…éƒ¨å˜é‡ï¼šè®°å½•å½“å‰é€Ÿåº¦ï¼Œä¾› SmoothDamp å‡½æ•°ä½¿ç”¨
     private Vector3 velocity = Vector3.zero;
 
-    // ¡ï ÃæÊÔ¿¼µã£ºÎªÊ²Ã´ÒªÓÃ LateUpdate£¿
-    // Update: ´¦ÀíÊäÈë
-    // FixedUpdate: ´¦ÀíÎïÀíÒÆ¶¯ (Ö÷½ÇÊÇÔÚÕâÀï¶¯µÄ)
-    // LateUpdate: ËùÓĞµÄ Update Ö´ĞĞÍêºóÖ´ĞĞ¡£
-    // ±ØĞëÔÚ LateUpdate ÒÆ¶¯Ïà»ú£¬²ÅÄÜ±£Ö¤Ö÷½ÇÒÑ¾­ÒÆ¶¯Íê±Ï£¬·ñÔòÏà»ú»áÔÚÖ÷½ÇÒÆ¶¯Ç°ÕâÒ»Ö¡äÖÈ¾£¬µ¼ÖÂ»­Ãæ¶¶¶¯ (Jitter)¡£
+    // â˜… é¢è¯•è€ƒç‚¹ï¼šä¸ºä»€ä¹ˆè¦ç”¨ LateUpdateï¼Ÿ
+    // Update: å¤„ç†è¾“å…¥
+    // FixedUpdate: å¤„ç†ç‰©ç†ç§»åŠ¨ (ä¸»è§’æ˜¯åœ¨è¿™é‡ŒåŠ¨çš„)
+    // LateUpdate: æ‰€æœ‰çš„ Update æ‰§è¡Œå®Œåæ‰§è¡Œã€‚
+    // å¿…é¡»åœ¨ LateUpdate ç§»åŠ¨ç›¸æœºï¼Œæ‰èƒ½ä¿è¯ä¸»è§’å·²ç»ç§»åŠ¨å®Œæ¯•ï¼Œå¦åˆ™ç›¸æœºä¼šåœ¨ä¸»è§’ç§»åŠ¨å‰è¿™ä¸€å¸§æ¸²æŸ“ï¼Œå¯¼è‡´ç”»é¢æŠ–åŠ¨ (Jitter)ã€‚
     void LateUpdate()
     {
         if (target == null) return;
 
-        // 1. ¼ÆËãÄ¿±êÎ»ÖÃ (Ö÷½ÇÎ»ÖÃ + Æ«ÒÆ)
+        // 1. è®¡ç®—ç›®æ ‡ä½ç½® (ä¸»è§’ä½ç½® + åç§»)
         Vector3 desiredPosition = target.position + offset;
 
-        // 2. Ê¹ÓÃÆ½»¬×èÄáËã·¨ÒÆ¶¯Ïà»ú
-        // SmoothDamp ÊÇÊµÏÖ¡°ÉãÓ°Ê¦¿¸×Å»úÆ÷ÅÜ¡±ÄÇÖÖÆ½»¬¸ĞµÄÔÚÉñÆ÷
+        // 2. ä½¿ç”¨å¹³æ»‘é˜»å°¼ç®—æ³•ç§»åŠ¨ç›¸æœº
+        // SmoothDamp æ˜¯å®ç°â€œæ‘„å½±å¸ˆæ‰›ç€æœºå™¨è·‘â€é‚£ç§å¹³æ»‘æ„Ÿçš„åœ¨ç¥å™¨
         Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, smoothSpeed);
 
-        // 3. Ó¦ÓÃÎ»ÖÃ
+        // 3. åº”ç”¨ä½ç½®
         transform.position = smoothedPosition;
     }
 }

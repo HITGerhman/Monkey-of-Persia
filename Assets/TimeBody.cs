@@ -1,21 +1,21 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
-// ¡¾ĞÂÔö¡¿ÒıÈëºó´¦ÀíÃüÃû¿Õ¼ä
+// ã€æ–°å¢ã€‘å¼•å…¥åå¤„ç†å‘½åç©ºé—´
 using UnityEngine.Rendering.PostProcessing;
-using UnityEngine.UI; // ¡¾ĞÂÔö¡¿ÒıÓÃ UI ÃüÃû¿Õ¼ä
+using UnityEngine.UI; // ã€æ–°å¢ã€‘å¼•ç”¨ UI å‘½åç©ºé—´
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class TimeBody : MonoBehaviour
 {
-    [Header("»ØËİÉèÖÃ")]
+    [Header("å›æº¯è®¾ç½®")]
     public float recordTime = 5f;
 
-    // ¡¾ĞÂÔö¡¿ÓÃÓÚÍÏ×§ÎÒÃÇµÄÌØĞ§Ìå»ı
-    [Header("ÌØĞ§ÉèÖÃ")]
+    // ã€æ–°å¢ã€‘ç”¨äºæ‹–æ‹½æˆ‘ä»¬çš„ç‰¹æ•ˆä½“ç§¯
+    [Header("ç‰¹æ•ˆè®¾ç½®")]
     public PostProcessVolume rewindVolume;
 
-    [Header("UI ÉèÖÃ")]
-    public Image energyBarFill; // ¡¾ĞÂÔö¡¿ÍÏÈëÄÇ¸öÂÌÉ«µÄ Image
+    [Header("UI è®¾ç½®")]
+    public Image energyBarFill; // ã€æ–°å¢ã€‘æ‹–å…¥é‚£ä¸ªç»¿è‰²çš„ Image
 
     private struct PointInTime
     {
@@ -36,19 +36,19 @@ public class TimeBody : MonoBehaviour
     private List<PointInTime> pointsInTime;
     private Rigidbody2D rb;
     private bool isRewinding = false;
-    private PlayerController _playerController; // ¡¾ĞÂÔö¡¿
+    private PlayerController _playerController; // ã€æ–°å¢ã€‘
 
     void Start()
     {
         pointsInTime = new List<PointInTime>();
         rb = GetComponent<Rigidbody2D>();
 
-        // ¡¾ĞÂÔö¡¿È·±£ÓÎÏ·¿ªÊ¼Ê±ÌØĞ§ÊÇ¹Ø±ÕµÄ
+        // ã€æ–°å¢ã€‘ç¡®ä¿æ¸¸æˆå¼€å§‹æ—¶ç‰¹æ•ˆæ˜¯å…³é—­çš„
         if (rewindVolume != null)
         {
             rewindVolume.weight = 0f;
             _playerController = GetComponent<PlayerController>();
-            // ¡¾ĞÂÔö¡¿Ã¿Ö¡¸üĞÂ UI
+            // ã€æ–°å¢ã€‘æ¯å¸§æ›´æ–° UI
             UpdateEnergyUI();
         }
     }
@@ -58,7 +58,7 @@ public class TimeBody : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Return)) StartRewind();
         if (Input.GetKeyUp(KeyCode.Return)) StopRewind();
 
-        // ¡¾ĞÂÔö¡¿Ã¿Ö¡¸üĞÂ UI
+        // ã€æ–°å¢ã€‘æ¯å¸§æ›´æ–° UI
         UpdateEnergyUI();
     }
 
@@ -95,12 +95,12 @@ public class TimeBody : MonoBehaviour
     {
         if (energyBarFill != null)
         {
-            // ¼ÆËãµ±Ç°¼ÇÂ¼ÁË¶àÉÙÖ¡
+            // è®¡ç®—å½“å‰è®°å½•äº†å¤šå°‘å¸§
             float currentFrames = pointsInTime.Count;
-            // ¼ÆËã×î´óÄÜ¼ÇÂ¼¶àÉÙÖ¡ (Ê±¼ä / ¹Ì¶¨Ö¡¼ä¸ô)
+            // è®¡ç®—æœ€å¤§èƒ½è®°å½•å¤šå°‘å¸§ (æ—¶é—´ / å›ºå®šå¸§é—´éš”)
             float maxFrames = recordTime / Time.fixedDeltaTime;
 
-            // ±ÈÀı = µ±Ç° / ×î´ó
+            // æ¯”ä¾‹ = å½“å‰ / æœ€å¤§
             energyBarFill.fillAmount = currentFrames / maxFrames;
         }
     }
@@ -110,15 +110,15 @@ public class TimeBody : MonoBehaviour
         isRewinding = true;
         rb.isKinematic = true;
 
-        // ¡¾ĞÂÔö¡¿¿ªÆôÌØĞ§£º°ÑÈ¨ÖØÉèÎª 1
-        // Èç¹ûÏë¸ü¸ß¼¶£¬¿ÉÒÔÓÃĞ­³Ì»òDOTweenÆ½»¬¹ı¶É£¬ÕâÀïÏÈÖ±½ÓÇĞ»»
+        // ã€æ–°å¢ã€‘å¼€å¯ç‰¹æ•ˆï¼šæŠŠæƒé‡è®¾ä¸º 1
+        // å¦‚æœæƒ³æ›´é«˜çº§ï¼Œå¯ä»¥ç”¨åç¨‹æˆ–DOTweenå¹³æ»‘è¿‡æ¸¡ï¼Œè¿™é‡Œå…ˆç›´æ¥åˆ‡æ¢
         if (rewindVolume != null)
         {
             rewindVolume.weight = 1f;
         }
-        // ¡¾ĞÂÔö¡¿¸´»îÂß¼­
-        // Ö»Òª¿ªÊ¼µ¹Á÷£¬ÎÒÃÇ¾Í¼ÙÉèÍæ¼ÒÕıÔÚ³¢ÊÔ´ÓËÀÍöÖĞ»Ö¸´
-        // ÎÒÃÇµ÷ÓÃ Player µÄ¸´»î·½·¨£¬ÏÈ°ÑÑÕÉ«±ä»ØÀ´£¬×´Ì¬ÖØÖÃ
+        // ã€æ–°å¢ã€‘å¤æ´»é€»è¾‘
+        // åªè¦å¼€å§‹å€’æµï¼Œæˆ‘ä»¬å°±å‡è®¾ç©å®¶æ­£åœ¨å°è¯•ä»æ­»äº¡ä¸­æ¢å¤
+        // æˆ‘ä»¬è°ƒç”¨ Player çš„å¤æ´»æ–¹æ³•ï¼Œå…ˆæŠŠé¢œè‰²å˜å›æ¥ï¼ŒçŠ¶æ€é‡ç½®
         if (_playerController != null)
         {
             _playerController.Resurrect();
@@ -136,7 +136,7 @@ public class TimeBody : MonoBehaviour
             rb.angularVelocity = point.angularVelocity;
         }
 
-        // ¡¾ĞÂÔö¡¿¹Ø±ÕÌØĞ§£º°ÑÈ¨ÖØÉèÎª 0
+        // ã€æ–°å¢ã€‘å…³é—­ç‰¹æ•ˆï¼šæŠŠæƒé‡è®¾ä¸º 0
         if (rewindVolume != null)
         {
             rewindVolume.weight = 0f;

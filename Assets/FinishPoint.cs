@@ -1,16 +1,16 @@
-using UnityEngine;
-using UnityEngine.SceneManagement; // ĞèÒªÕâ¸öÀ´ÖØÖÃ³¡¾°
+ï»¿using UnityEngine;
+using UnityEngine.SceneManagement; // éœ€è¦è¿™ä¸ªæ¥é‡ç½®åœºæ™¯
 
 public class FinishPoint : MonoBehaviour
 {
-    [Header("UI ÉèÖÃ")]
-    public GameObject winUiObject; // ÍÏÈë¸Õ²Å×öµÄ WinText
+    [Header("UI è®¾ç½®")]
+    public GameObject winUiObject; // æ‹–å…¥åˆšæ‰åšçš„ WinText
 
     private bool _levelCompleted = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Èç¹ûÅöµ½µÄÊÇÖ÷½Ç£¬ÇÒ¹Ø¿¨»¹Ã»½áÊø
+        // å¦‚æœç¢°åˆ°çš„æ˜¯ä¸»è§’ï¼Œä¸”å…³å¡è¿˜æ²¡ç»“æŸ
         if (!_levelCompleted && collision.gameObject.CompareTag("Player"))
         {
             CompleteLevel();
@@ -21,28 +21,28 @@ public class FinishPoint : MonoBehaviour
     {
         _levelCompleted = true;
 
-        Debug.Log("Ê¤Àû£¡");
+        Debug.Log("èƒœåˆ©ï¼");
 
-        // 1. ÏÔÊ¾Ê¤Àû UI
+        // 1. æ˜¾ç¤ºèƒœåˆ© UI
         if (winUiObject != null)
         {
             winUiObject.SetActive(true);
         }
 
-        // 2. (¿ÉÑ¡) ²¥·ÅÊ¤ÀûÒôĞ§
-        // 3. (¿ÉÑ¡) ¶³½áÖ÷½Ç£¬·ÀÖ¹ËûÅÜ³öÆÁÄ»£¬»òÕßÈÃËûÍ£ÔÚÆìÖÄÄÇ»¶ºô
-        // ÕâÀïÎÒÃÇÒª»ñÈ¡Ö÷½ÇµÄ Rigidbody À´ÈÃËûÍ£ÏÂ
+        // 2. (å¯é€‰) æ’­æ”¾èƒœåˆ©éŸ³æ•ˆ
+        // 3. (å¯é€‰) å†»ç»“ä¸»è§’ï¼Œé˜²æ­¢ä»–è·‘å‡ºå±å¹•ï¼Œæˆ–è€…è®©ä»–åœåœ¨æ——å¸œé‚£æ¬¢å‘¼
+        // è¿™é‡Œæˆ‘ä»¬è¦è·å–ä¸»è§’çš„ Rigidbody æ¥è®©ä»–åœä¸‹
         Rigidbody2D playerRb = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
         if (playerRb != null)
         {
             playerRb.velocity = Vector2.zero;
-            playerRb.isKinematic = true; // ÀàËÆÓÚËÀÍöÊ±µÄ¶³½á£¬µ«Õâ´ÎÊÇ¿ªĞÄµÄ¶³½á
+            playerRb.isKinematic = true; // ç±»ä¼¼äºæ­»äº¡æ—¶çš„å†»ç»“ï¼Œä½†è¿™æ¬¡æ˜¯å¼€å¿ƒçš„å†»ç»“
         }
     }
 
     private void Update()
     {
-        // Ö»ÓĞÔÚÊ¤Àûºó£¬°´ R ²ÅÄÜÖØÖÃ
+        // åªæœ‰åœ¨èƒœåˆ©åï¼ŒæŒ‰ R æ‰èƒ½é‡ç½®
         if (_levelCompleted && Input.GetKeyDown(KeyCode.R))
         {
             RestartGame();
@@ -51,7 +51,7 @@ public class FinishPoint : MonoBehaviour
 
     void RestartGame()
     {
-        // »ñÈ¡µ±Ç°³¡¾°µÄÃû×Ö£¬²¢ÖØĞÂ¼ÓÔØËü
+        // è·å–å½“å‰åœºæ™¯çš„åå­—ï¼Œå¹¶é‡æ–°åŠ è½½å®ƒ
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
