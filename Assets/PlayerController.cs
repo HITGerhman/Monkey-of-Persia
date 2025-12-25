@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
     private bool _isGrounded;
     private float _coyoteTimeCounter;
     private float _jumpBufferCounter;
+    private Animator _anim;
 
     // 【新增】死亡状态标记
     public bool IsDead { get; private set; } // 公有属性，供其他脚本读取
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         // 【新增】获取渲染组件以便变色
         _sr = GetComponent<SpriteRenderer>();
+        _anim = GetComponent<Animator>();
     }
 
     private void Update()
@@ -65,6 +67,12 @@ public class PlayerController : MonoBehaviour
             _rb.velocity = new Vector2(_rb.velocity.x, jumpForce);
             _jumpBufferCounter = 0f;
             _coyoteTimeCounter = 0f;
+        }
+        //  驱动动画
+        // 我们传入绝对值 (Mathf.Abs)，因为不管向左跑(-1)还是向右跑(1)，速度都是正的
+        if (_anim != null)
+        {
+            _anim.SetFloat("Speed", Mathf.Abs(_moveInput));
         }
 
         if (_rb.velocity.y < 0) _rb.gravityScale = fallMultiplier;
