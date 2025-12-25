@@ -23,15 +23,14 @@ public class TimeBody : MonoBehaviour
         public Quaternion rotation;
         public Vector2 velocity;
         public float angularVelocity;
-        public Color color; // 【新增】记录这一帧的颜色
 
-        public PointInTime(Vector3 _pos, Quaternion _rot, Vector2 _vel, float _angVel, Color _col)
+
+        public PointInTime(Vector3 _pos, Quaternion _rot, Vector2 _vel, float _angVel)
         {
             position = _pos;
             rotation = _rot;
             velocity = _vel;
             angularVelocity = _angVel;
-            color = _col; // 【新增】赋值
         }
     }
 
@@ -75,10 +74,8 @@ public class TimeBody : MonoBehaviour
 
     void Record()
     {
-        if (_sr != null) // 安全检查
-        {
-             pointsInTime.Insert(0, new PointInTime(transform.position, transform.rotation, rb.velocity, rb.angularVelocity, _sr.color));
-        }
+    
+        pointsInTime.Insert(0, new PointInTime(transform.position, transform.rotation, rb.velocity, rb.angularVelocity));
         if (pointsInTime.Count > Mathf.Round(recordTime / Time.fixedDeltaTime))
         {
             pointsInTime.RemoveAt(pointsInTime.Count - 1);
@@ -92,8 +89,6 @@ public class TimeBody : MonoBehaviour
             PointInTime point = pointsInTime[0];
             transform.position = point.position;
             transform.rotation = point.rotation;
-            // 【新增】恢复颜色
-            if (_sr != null) _sr.color = point.color;
             pointsInTime.RemoveAt(0);
         }
         else

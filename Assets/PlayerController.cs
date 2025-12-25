@@ -110,10 +110,14 @@ public class PlayerController : MonoBehaviour
     // 【新增】死亡处理
     void Die()
     {
+        if (IsDead) return;
         IsDead = true;
-
+        if (_anim != null) 
+        {
+            _anim.SetBool("IsDead", true);
+        }
         // 视觉反馈：变红
-        _sr.color = Color.red;
+        //_sr.color = Color.red;
 
         // 物理反馈：停下并冻结
         _rb.velocity = Vector2.zero;
@@ -130,10 +134,6 @@ public class PlayerController : MonoBehaviour
         // 【新增逻辑】
         // 如果 resetColor 是 true，我们强制变绿（比如关卡重置时）
         // 如果 resetColor 是 false（比如时间倒流时），我们就不动颜色，交给 TimeBody 去回溯
-        if (resetColor)
-        {
-            _sr.color = Color.green; 
-        }
         _rb.isKinematic = false; // 恢复物理
     }
 
