@@ -23,13 +23,15 @@ public class TimeBody : MonoBehaviour
         public Quaternion rotation;
         public Vector2 velocity;
         public float angularVelocity;
+        public Color color; // 【新增】记录这一帧的颜色
 
-        public PointInTime(Vector3 _pos, Quaternion _rot, Vector2 _vel, float _angVel)
+        public PointInTime(Vector3 _pos, Quaternion _rot, Vector2 _vel, float _angVel, Color _col)
         {
             position = _pos;
             rotation = _rot;
             velocity = _vel;
             angularVelocity = _angVel;
+            color = _col; // 【新增】赋值
         }
     }
 
@@ -37,6 +39,7 @@ public class TimeBody : MonoBehaviour
     private Rigidbody2D rb;
     private bool isRewinding = false;
     private PlayerController _playerController; // 【新增】
+    private SpriteRenderer _sr;
 
     void Start()
     {
@@ -48,6 +51,8 @@ public class TimeBody : MonoBehaviour
         {
             rewindVolume.weight = 0f;
             _playerController = GetComponent<PlayerController>();
+            // 【新增】获取渲染组件
+            _sr = GetComponent<SpriteRenderer>();
             // 【新增】每帧更新 UI
             UpdateEnergyUI();
         }
@@ -70,7 +75,10 @@ public class TimeBody : MonoBehaviour
 
     void Record()
     {
-        pointsInTime.Insert(0, new PointInTime(transform.position, transform.rotation, rb.velocity, rb.angularVelocity));
+        if (_sr != null) // 安全检查
+        {
+             pointsInTime.Insert(0, new PointInTime(transform.position, transform.rotation, rb.velocity, rb.angularVelocity, _sr.color));
+        }
         if (pointsInTime.Count > Mathf.Round(recordTime / Time.fixedDeltaTime))
         {
             pointsInTime.RemoveAt(pointsInTime.Count - 1);
@@ -84,6 +92,8 @@ public class TimeBody : MonoBehaviour
             PointInTime point = pointsInTime[0];
             transform.position = point.position;
             transform.rotation = point.rotation;
+            // 【新增】恢复颜色
+            if (_sr != null) _sr.color = point.color;
             pointsInTime.RemoveAt(0);
         }
         else
@@ -121,7 +131,8 @@ public class TimeBody : MonoBehaviour
         // 我们调用 Player 的复活方法，先把颜色变回来，状态重置
         if (_playerController != null)
         {
-            _playerController.Resurrect();
+            // 这里我们只通知 Player "我复活了"（解开物理锁），但颜色交给 Rewind() 函数去一帧帧还原
+            _playerController.Resurrect(false); // 我们可以给 Resurrect 加个参数，或者去修改 Resurrect 方法
         }
     }
 

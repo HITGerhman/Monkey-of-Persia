@@ -54,6 +54,15 @@ public class PlayerController : MonoBehaviour
 
         // --- 以下是原 Update 代码的精简版引用 ---
         _moveInput = Input.GetAxisRaw("Horizontal");
+        // 【新增】处理图片翻转
+    if (_moveInput > 0)
+        {
+         _sr.flipX = false; // 向右跑，不翻转
+        }
+    else if (_moveInput < 0)
+    {
+        _sr.flipX = true;  // 向左跑，翻转 X 轴
+    }
         _isGrounded = Physics2D.OverlapCircle(groundCheckPoint.position, checkRadius, whatIsGround);
 
         if (_isGrounded) _coyoteTimeCounter = coyoteTime;
@@ -114,10 +123,17 @@ public class PlayerController : MonoBehaviour
     }
 
     // 【新增】复活方法（将被 TimeBody 调用）
-    public void Resurrect()
+    public void Resurrect(bool resetColor = true)
     {
         IsDead = false;
-        _sr.color = Color.green; // 恢复原来的颜色（或者白色）
+        //_sr.color = Color.green; // 恢复原来的颜色（或者白色）
+        // 【新增逻辑】
+        // 如果 resetColor 是 true，我们强制变绿（比如关卡重置时）
+        // 如果 resetColor 是 false（比如时间倒流时），我们就不动颜色，交给 TimeBody 去回溯
+        if (resetColor)
+        {
+            _sr.color = Color.green; 
+        }
         _rb.isKinematic = false; // 恢复物理
     }
 
