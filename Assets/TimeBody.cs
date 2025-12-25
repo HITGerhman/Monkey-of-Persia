@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 // 【新增】引入后处理命名空间
 using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.UI; // 【新增】引用 UI 命名空间
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class TimeBody : MonoBehaviour
@@ -12,6 +13,9 @@ public class TimeBody : MonoBehaviour
     // 【新增】用于拖拽我们的特效体积
     [Header("特效设置")]
     public PostProcessVolume rewindVolume;
+
+    [Header("UI 设置")]
+    public Image energyBarFill; // 【新增】拖入那个绿色的 Image
 
     private struct PointInTime
     {
@@ -44,6 +48,8 @@ public class TimeBody : MonoBehaviour
         {
             rewindVolume.weight = 0f;
             _playerController = GetComponent<PlayerController>();
+            // 【新增】每帧更新 UI
+            UpdateEnergyUI();
         }
     }
 
@@ -51,6 +57,9 @@ public class TimeBody : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return)) StartRewind();
         if (Input.GetKeyUp(KeyCode.Return)) StopRewind();
+
+        // 【新增】每帧更新 UI
+        UpdateEnergyUI();
     }
 
     void FixedUpdate()
@@ -80,6 +89,19 @@ public class TimeBody : MonoBehaviour
         else
         {
             StopRewind();
+        }
+    }
+    void UpdateEnergyUI()
+    {
+        if (energyBarFill != null)
+        {
+            // 计算当前记录了多少帧
+            float currentFrames = pointsInTime.Count;
+            // 计算最大能记录多少帧 (时间 / 固定帧间隔)
+            float maxFrames = recordTime / Time.fixedDeltaTime;
+
+            // 比例 = 当前 / 最大
+            energyBarFill.fillAmount = currentFrames / maxFrames;
         }
     }
 
