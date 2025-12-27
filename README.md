@@ -1,12 +1,14 @@
-# ⏳ Time Rewind Demo (Unity)
+![PixPin_2025-12-27_19-26-30](https://github.com/user-attachments/assets/ce680ee2-2cbf-4a45-bf90-8c74cbc2c3b4)# ⏳ Time Rewind Demo (Unity)
 
 一个基于 Unity 2D 的时间回溯机制 Demo，灵感来源于《Braid》和《波斯王子》。
 实现了基于环形缓冲区的状态记录与回放系统。
 
 ## 🎮 演示 (Demo)
 
-![Gameplay Demo](这里放你的GIF动图链接.gif)
-*(建议用 LICEcap 或 ScreenToGif 录制一个 5秒的动图，上传到 GitHub Issue 或图床，然后把链接贴在这里。没有动图的项目是没有灵魂的！)*
+![PixPin_2025-12-27_19-25-39](https://github.com/user-attachments/assets/32258676-8ad3-43c2-a84e-06c5fb2b9fbe)
+![PixPin_2025-12-27_19-26-30](https://github.com/user-attachments/assets/d1a13a29-08df-4a04-8695-7fe9de8811b4)
+
+
 
 ## 🛠️ 技术栈 (Tech Stack)
 
