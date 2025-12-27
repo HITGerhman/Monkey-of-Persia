@@ -130,6 +130,10 @@ public class PlayerController : MonoBehaviour
     public void Resurrect(bool resetColor = true)
     {
         IsDead = false;
+        if (_anim != null)
+        {
+            _anim.SetBool("IsDead", false);
+        }
         //_sr.color = Color.green; // 恢复原来的颜色（或者白色）
         // 【新增逻辑】
         // 如果 resetColor 是 true，我们强制变绿（比如关卡重置时）

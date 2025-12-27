@@ -44,17 +44,19 @@ public class TimeBody : MonoBehaviour
     {
         pointsInTime = new List<PointInTime>();
         rb = GetComponent<Rigidbody2D>();
+        
+        // 【关键修改】把获取组件的代码移到外面来！确保一定能拿到！
+        _playerController = GetComponent<PlayerController>();
+        _sr = GetComponent<SpriteRenderer>();
 
-        // 【新增】确保游戏开始时特效是关闭的
+        // 特效设置单独放在 if 里
         if (rewindVolume != null)
         {
             rewindVolume.weight = 0f;
-            _playerController = GetComponent<PlayerController>();
-            // 【新增】获取渲染组件
-            _sr = GetComponent<SpriteRenderer>();
-            // 【新增】每帧更新 UI
-            UpdateEnergyUI();
         }
+        
+        // UI 更新也移出来比较安全
+        UpdateEnergyUI();
     }
 
     void Update()
@@ -113,14 +115,8 @@ public class TimeBody : MonoBehaviour
     public void StartRewind()
     {
         isRewinding = true;
-        rb.isKinematic = true;
+    
 
-        // 【新增】开启特效：把权重设为 1
-        // 如果想更高级，可以用协程或DOTween平滑过渡，这里先直接切换
-        if (rewindVolume != null)
-        {
-            rewindVolume.weight = 1f;
-        }
         // 【新增】复活逻辑
         // 只要开始倒流，我们就假设玩家正在尝试从死亡中恢复
         // 我们调用 Player 的复活方法，先把颜色变回来，状态重置
@@ -129,6 +125,14 @@ public class TimeBody : MonoBehaviour
             // 这里我们只通知 Player "我复活了"（解开物理锁），但颜色交给 Rewind() 函数去一帧帧还原
             _playerController.Resurrect(false); // 我们可以给 Resurrect 加个参数，或者去修改 Resurrect 方法
         }
+        rb.isKinematic = true;
+        // 【新增】开启特效：把权重设为 1
+        // 如果想更高级，可以用协程或DOTween平滑过渡，这里先直接切换
+        if (rewindVolume != null)
+        {
+            rewindVolume.weight = 1f;
+        }
+
     }
 
     public void StopRewind()

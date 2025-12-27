@@ -56,5 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "TimeRewindDemo.sln"
+    "dotnet.defaultSolution": "TimeRewindDemo.sln",
+    "dotnet.preferCSharpExtension": true
 }
