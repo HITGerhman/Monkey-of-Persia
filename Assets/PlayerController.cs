@@ -100,6 +100,12 @@ public class PlayerController : MonoBehaviour
             _rb.velocity = new Vector2(_rb.velocity.x, jumpForce);
             _jumpBufferCounter = 0f;
             _coyoteTimeCounter = 0f;
+
+            // 播放跳跃音效
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayJumpSfx();
+            }
         }
     }
 
@@ -156,6 +162,12 @@ public class PlayerController : MonoBehaviour
         // 停止物理运动并设为运动学，防止尸体滑落
         _rb.velocity = Vector2.zero;
         _rb.isKinematic = true;
+
+        // 播放死亡音效
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayDieSfx();
+        }
 
         Debug.Log("你死了！按回车倒流！");
     }

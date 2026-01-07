@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 管理时间回溯机制的组件。
-/// 负责记录物体的位置、旋转和速度信息，并在回溯时还原这些状态。
-/// 同时处理回溯时的视觉特效（后处理）和 UI 显示。
+/// 负责记录物体的位置、旋转、速度和颜色信息，并在回溯时还原这些状态。
+/// 同时处理回溯时的视觉特效（后处理）、UI 显示以及音频混音。
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class TimeBody : MonoBehaviour
@@ -32,13 +32,15 @@ public class TimeBody : MonoBehaviour
         public Quaternion rotation;
         public Vector2 velocity;
         public float angularVelocity;
+        public Color color; // 【新增】记录颜色状态
 
-        public PointInTime(Vector3 _pos, Quaternion _rot, Vector2 _vel, float _angVel)
+        public PointInTime(Vector3 _pos, Quaternion _rot, Vector2 _vel, float _angVel, Color _col)
         {
             position = _pos;
             rotation = _rot;
             velocity = _vel;
             angularVelocity = _angVel;
+            color = _col;
         }
     }
 
@@ -86,8 +88,17 @@ public class TimeBody : MonoBehaviour
     /// </summary>
     void Record()
     {
+        // 获取当前颜色
+        Color currentColor = _sr != null ? _sr.color : Color.white;
+
         // 在列表头部插入当前状态
-        pointsInTime.Insert(0, new PointInTime(transform.position, transform.rotation, rb.velocity, rb.angularVelocity));
+        pointsInTime.Insert(0, new PointInTime(
+            transform.position, 
+            transform.rotation, 
+            rb.velocity, 
+            rb.angularVelocity,
+            currentColor
+        ));
         
         // 移除超出最大记录时间的旧数据
         if (pointsInTime.Count > Mathf.Round(recordTime / Time.fixedDeltaTime))
@@ -107,6 +118,13 @@ public class TimeBody : MonoBehaviour
             PointInTime point = pointsInTime[0];
             transform.position = point.position;
             transform.rotation = point.rotation;
+            
+            // 还原颜色
+            if (_sr != null)
+            {
+                _sr.color = point.color;
+            }
+
             pointsInTime.RemoveAt(0);
         }
         else
@@ -136,6 +154,7 @@ public class TimeBody : MonoBehaviour
         // 如果关联了玩家控制器，尝试触发复活逻辑（解除物理锁定等）
         if (_playerController != null)
         {
+            // 传入 false 表示不强制重置颜色，而是交给 rewind 逐帧还原
             _playerController.Resurrect(false);
         }
 
@@ -146,6 +165,12 @@ public class TimeBody : MonoBehaviour
         if (rewindVolume != null)
         {
             rewindVolume.weight = 1f;
+        }
+
+        // 播放倒带音效并进行混音
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StartRewindAudio();
         }
     }
 
@@ -166,6 +191,12 @@ public class TimeBody : MonoBehaviour
         if (rewindVolume != null)
         {
             rewindVolume.weight = 0f;
+        }
+
+        // 停止倒带音效并恢复背景音乐
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StopRewindAudio();
         }
     }
 }

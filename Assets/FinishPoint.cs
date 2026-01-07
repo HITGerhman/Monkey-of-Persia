@@ -31,6 +31,12 @@ public class FinishPoint : MonoBehaviour
 
         Debug.Log("胜利！");
 
+        // 播放胜利音效
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayWinSfx();
+        }
+
         // 显示胜利 UI
         if (winUiObject != null)
         {
