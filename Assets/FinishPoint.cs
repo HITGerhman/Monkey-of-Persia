@@ -1,10 +1,15 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement; // 需要这个来重置场景
+using UnityEngine.SceneManagement;
 
+/// <summary>
+/// 处理关卡终点逻辑。
+/// 当玩家到达终点时，显示胜利 UI 并处理关卡重置。
+/// </summary>
 public class FinishPoint : MonoBehaviour
 {
     [Header("UI 设置")]
-    public GameObject winUiObject; // 拖入刚才做的 WinText
+    [Tooltip("胜利时显示的 UI 对象")]
+    public GameObject winUiObject;
 
     private bool _levelCompleted = false;
 
@@ -17,32 +22,37 @@ public class FinishPoint : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 执行关卡完成逻辑
+    /// </summary>
     void CompleteLevel()
     {
         _levelCompleted = true;
 
         Debug.Log("胜利！");
 
-        // 1. 显示胜利 UI
+        // 显示胜利 UI
         if (winUiObject != null)
         {
             winUiObject.SetActive(true);
         }
 
-        // 2. (可选) 播放胜利音效
-        // 3. (可选) 冻结主角，防止他跑出屏幕，或者让他停在旗帜那欢呼
-        // 这里我们要获取主角的 Rigidbody 来让他停下
-        Rigidbody2D playerRb = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
-        if (playerRb != null)
+        // 停止玩家移动
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
         {
-            playerRb.velocity = Vector2.zero;
-            playerRb.isKinematic = true; // 类似于死亡时的冻结，但这次是开心的冻结
+            Rigidbody2D playerRb = playerObj.GetComponent<Rigidbody2D>();
+            if (playerRb != null)
+            {
+                playerRb.velocity = Vector2.zero;
+                playerRb.isKinematic = true; 
+            }
         }
     }
 
     private void Update()
     {
-        // 只有在胜利后，按 R 才能重置
+        // 胜利后允许按 R 键重置关卡
         if (_levelCompleted && Input.GetKeyDown(KeyCode.R))
         {
             RestartGame();
@@ -51,7 +61,6 @@ public class FinishPoint : MonoBehaviour
 
     void RestartGame()
     {
-        // 获取当前场景的名字，并重新加载它
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

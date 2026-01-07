@@ -1,35 +1,38 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// 相机跟随脚本。
+/// 使相机平滑地跟随目标物体（通常是玩家）。
+/// </summary>
 public class CameraFollow : MonoBehaviour
 {
     [Header("目标设置")]
-    public Transform target;        // 要跟随的主角
-    public Vector3 offset = new Vector3(0f, 0f, -10f); // 相对偏移量 (Z轴必须是-10，否则相机会看不到2D物体)
+    [Tooltip("要跟随的目标对象")]
+    public Transform target;
+    [Tooltip("相机相对于目标的偏移量（Z轴通常设置为-10以保证2D物体可见）")]
+    public Vector3 offset = new Vector3(0f, 0f, -10f);
 
     [Header("手感微调")]
     [Range(0, 1)]
-    public float smoothSpeed = 0.125f; // 跟随延迟 (0=瞬间, 1=不动)，越小越紧，越大越平滑
+    [Tooltip("跟随平滑度：值越小跟随越紧密，值越大越平滑")]
+    public float smoothSpeed = 0.125f;
 
-    // 内部变量：记录当前速度，供 SmoothDamp 函数使用
+    // SmoothDamp 函数使用的当前速度引用
     private Vector3 velocity = Vector3.zero;
 
-    // ★ 面试考点：为什么要用 LateUpdate？
-    // Update: 处理输入
-    // FixedUpdate: 处理物理移动 (主角是在这里动的)
-    // LateUpdate: 所有的 Update 执行完后执行。
-    // 必须在 LateUpdate 移动相机，才能保证主角已经移动完毕，否则相机会在主角移动前这一帧渲染，导致画面抖动 (Jitter)。
+    // 使用 LateUpdate 确保在目标物体所有移动逻辑（Update/FixedUpdate）完成后才移动相机，
+    // 避免因执行顺序问题导致画面抖动。
     void LateUpdate()
     {
         if (target == null) return;
 
-        // 1. 计算目标位置 (主角位置 + 偏移)
+        // 计算目标位置
         Vector3 desiredPosition = target.position + offset;
 
-        // 2. 使用平滑阻尼算法移动相机
-        // SmoothDamp 是实现“摄影师扛着机器跑”那种平滑感的在神器
+        // 使用平滑阻尼算法移动相机，实现平滑跟随效果
         Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, smoothSpeed);
 
-        // 3. 应用位置
+        // 更新相机位置
         transform.position = smoothedPosition;
     }
 }

@@ -1,29 +1,37 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-// 【新增】引入后处理命名空间
 using UnityEngine.Rendering.PostProcessing;
-using UnityEngine.UI; // 【新增】引用 UI 命名空间
+using UnityEngine.UI;
 
+/// <summary>
+/// 管理时间回溯机制的组件。
+/// 负责记录物体的位置、旋转和速度信息，并在回溯时还原这些状态。
+/// 同时处理回溯时的视觉特效（后处理）和 UI 显示。
+/// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class TimeBody : MonoBehaviour
 {
     [Header("回溯设置")]
+    [Tooltip("最大可回溯的时间长度（秒）")]
     public float recordTime = 5f;
 
-    // 【新增】用于拖拽我们的特效体积
     [Header("特效设置")]
+    [Tooltip("回溯时激活的后处理体积")]
     public PostProcessVolume rewindVolume;
 
     [Header("UI 设置")]
-    public Image energyBarFill; // 【新增】拖入那个绿色的 Image
+    [Tooltip("显示剩余回溯能量的 UI 填充图像")]
+    public Image energyBarFill;
 
+    /// <summary>
+    /// 记录某一时刻的物体状态结构体
+    /// </summary>
     private struct PointInTime
     {
         public Vector3 position;
         public Quaternion rotation;
         public Vector2 velocity;
         public float angularVelocity;
-
 
         public PointInTime(Vector3 _pos, Quaternion _rot, Vector2 _vel, float _angVel)
         {
@@ -37,7 +45,7 @@ public class TimeBody : MonoBehaviour
     private List<PointInTime> pointsInTime;
     private Rigidbody2D rb;
     private bool isRewinding = false;
-    private PlayerController _playerController; // 【新增】
+    private PlayerController _playerController;
     private SpriteRenderer _sr;
 
     void Start()
@@ -45,26 +53,25 @@ public class TimeBody : MonoBehaviour
         pointsInTime = new List<PointInTime>();
         rb = GetComponent<Rigidbody2D>();
         
-        // 【关键修改】把获取组件的代码移到外面来！确保一定能拿到！
+        // 获取相关组件引用
         _playerController = GetComponent<PlayerController>();
         _sr = GetComponent<SpriteRenderer>();
 
-        // 特效设置单独放在 if 里
+        // 初始化后处理特效状态
         if (rewindVolume != null)
         {
             rewindVolume.weight = 0f;
         }
         
-        // UI 更新也移出来比较安全
         UpdateEnergyUI();
     }
 
     void Update()
     {
+        // 监听回溯按键输入
         if (Input.GetKeyDown(KeyCode.Return)) StartRewind();
         if (Input.GetKeyUp(KeyCode.Return)) StopRewind();
 
-        // 【新增】每帧更新 UI
         UpdateEnergyUI();
     }
 
@@ -74,20 +81,29 @@ public class TimeBody : MonoBehaviour
         else Record();
     }
 
+    /// <summary>
+    /// 记录当前帧的状态
+    /// </summary>
     void Record()
     {
-    
+        // 在列表头部插入当前状态
         pointsInTime.Insert(0, new PointInTime(transform.position, transform.rotation, rb.velocity, rb.angularVelocity));
+        
+        // 移除超出最大记录时间的旧数据
         if (pointsInTime.Count > Mathf.Round(recordTime / Time.fixedDeltaTime))
         {
             pointsInTime.RemoveAt(pointsInTime.Count - 1);
         }
     }
 
+    /// <summary>
+    /// 执行回溯逻辑
+    /// </summary>
     void Rewind()
     {
         if (pointsInTime.Count > 0)
         {
+            // 取出最近的状态并应用
             PointInTime point = pointsInTime[0];
             transform.position = point.position;
             transform.rotation = point.rotation;
@@ -95,19 +111,20 @@ public class TimeBody : MonoBehaviour
         }
         else
         {
+            // 没有更多记录数据时停止回溯
             StopRewind();
         }
     }
+
+    /// <summary>
+    /// 更新能量条 UI 显示
+    /// </summary>
     void UpdateEnergyUI()
     {
         if (energyBarFill != null)
         {
-            // 计算当前记录了多少帧
             float currentFrames = pointsInTime.Count;
-            // 计算最大能记录多少帧 (时间 / 固定帧间隔)
             float maxFrames = recordTime / Time.fixedDeltaTime;
-
-            // 比例 = 当前 / 最大
             energyBarFill.fillAmount = currentFrames / maxFrames;
         }
     }
@@ -116,29 +133,28 @@ public class TimeBody : MonoBehaviour
     {
         isRewinding = true;
     
-
-        // 【新增】复活逻辑
-        // 只要开始倒流，我们就假设玩家正在尝试从死亡中恢复
-        // 我们调用 Player 的复活方法，先把颜色变回来，状态重置
+        // 如果关联了玩家控制器，尝试触发复活逻辑（解除物理锁定等）
         if (_playerController != null)
         {
-            // 这里我们只通知 Player "我复活了"（解开物理锁），但颜色交给 Rewind() 函数去一帧帧还原
-            _playerController.Resurrect(false); // 我们可以给 Resurrect 加个参数，或者去修改 Resurrect 方法
+            _playerController.Resurrect(false);
         }
+
+        // 回溯时设为运动学刚体，由代码直接控制位置
         rb.isKinematic = true;
-        // 【新增】开启特效：把权重设为 1
-        // 如果想更高级，可以用协程或DOTween平滑过渡，这里先直接切换
+
+        // 启用回溯视觉特效
         if (rewindVolume != null)
         {
             rewindVolume.weight = 1f;
         }
-
     }
 
     public void StopRewind()
     {
         isRewinding = false;
         rb.isKinematic = false;
+
+        // 恢复回溯结束时的速度状态
         if (pointsInTime.Count > 0)
         {
             PointInTime point = pointsInTime[0];
@@ -146,7 +162,7 @@ public class TimeBody : MonoBehaviour
             rb.angularVelocity = point.angularVelocity;
         }
 
-        // 【新增】关闭特效：把权重设为 0
+        // 关闭回溯视觉特效
         if (rewindVolume != null)
         {
             rewindVolume.weight = 0f;
