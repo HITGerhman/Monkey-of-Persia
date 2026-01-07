@@ -18,6 +18,8 @@ public class TimeBody : MonoBehaviour
     [Header("特效设置")]
     [Tooltip("回溯时激活的后处理体积")]
     public PostProcessVolume rewindVolume;
+    [Tooltip("特效过渡速度")]
+    public float effectTransitionSpeed = 5f;
 
     [Header("UI 设置")]
     [Tooltip("显示剩余回溯能量的 UI 填充图像")]
@@ -32,7 +34,7 @@ public class TimeBody : MonoBehaviour
         public Quaternion rotation;
         public Vector2 velocity;
         public float angularVelocity;
-        public Color color; // 【新增】记录颜色状态
+        public Color color; // 记录颜色状态
 
         public PointInTime(Vector3 _pos, Quaternion _rot, Vector2 _vel, float _angVel, Color _col)
         {
@@ -49,6 +51,9 @@ public class TimeBody : MonoBehaviour
     private bool isRewinding = false;
     private PlayerController _playerController;
     private SpriteRenderer _sr;
+
+    // 动态计算的目标权重
+    private float _targetWeight = 0f;
 
     void Start()
     {
@@ -73,6 +78,9 @@ public class TimeBody : MonoBehaviour
         // 监听回溯按键输入
         if (Input.GetKeyDown(KeyCode.Return)) StartRewind();
         if (Input.GetKeyUp(KeyCode.Return)) StopRewind();
+
+        // 动态插值更新后处理权重
+        UpdatePostProcessing();
 
         UpdateEnergyUI();
     }
@@ -147,6 +155,19 @@ public class TimeBody : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 动态更新后处理权重
+    /// </summary>
+    void UpdatePostProcessing()
+    {
+        if (rewindVolume != null)
+        {
+            // 使用 Lerp 实现权重的平滑过渡
+            // 这会间接控制色差和畸变的强度，因为它们都绑定在这个 Profile 上
+            rewindVolume.weight = Mathf.Lerp(rewindVolume.weight, _targetWeight, Time.deltaTime * effectTransitionSpeed);
+        }
+    }
+
     public void StartRewind()
     {
         isRewinding = true;
@@ -158,14 +179,12 @@ public class TimeBody : MonoBehaviour
             _playerController.Resurrect(false);
         }
 
-        // 回溯时设为运动学刚体，由代码直接控制位置
+        // 关键逻辑：回溯时设为运动学刚体
+        // 这解决了物理碰撞的 Edge Case，防止回溯时物体与墙壁发生物理穿插和抖动
         rb.isKinematic = true;
 
-        // 启用回溯视觉特效
-        if (rewindVolume != null)
-        {
-            rewindVolume.weight = 1f;
-        }
+        // 设置目标权重为 1，Update 中会平滑过渡
+        _targetWeight = 1f;
 
         // 播放倒带音效并进行混音
         if (AudioManager.Instance != null)
@@ -177,6 +196,8 @@ public class TimeBody : MonoBehaviour
     public void StopRewind()
     {
         isRewinding = false;
+        
+        // 恢复物理模拟
         rb.isKinematic = false;
 
         // 恢复回溯结束时的速度状态
@@ -187,11 +208,8 @@ public class TimeBody : MonoBehaviour
             rb.angularVelocity = point.angularVelocity;
         }
 
-        // 关闭回溯视觉特效
-        if (rewindVolume != null)
-        {
-            rewindVolume.weight = 0f;
-        }
+        // 设置目标权重为 0，Update 中会平滑过渡
+        _targetWeight = 0f;
 
         // 停止倒带音效并恢复背景音乐
         if (AudioManager.Instance != null)
